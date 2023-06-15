@@ -1,0 +1,55 @@
+.product {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.product-img {
+  width: 100px;
+  height: 100px;
+  margin-right: 10px;
+}
+.product-name {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+.product-date {
+  color: gray;
+  font-size: 12px;
+}
+.rides-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.ride-card {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 20px;
+  background-color: #f2f2f2;
+}
+
+.ride-card .label {
+  font-weight: bold;
+}
+
+.ride-card .status {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-weight: bold;
+}
+
+.approved {
+  background-color: #8bc34a;
+  color: #fff;
+}
+
+.pending {
+  background-color: #ffc107;
+}
+
+.cancelled {
+  background-color: #f44336;
+  color: #fff;
+}

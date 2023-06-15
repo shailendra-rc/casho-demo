@@ -1,4 +1,7 @@
 package com.example.app
 
-class PluginCallSingleton {
+import com.getcapacitor.PluginCall
+
+object PluginCallSingleton {
+  lateinit var pluginCall: PluginCall
 }
