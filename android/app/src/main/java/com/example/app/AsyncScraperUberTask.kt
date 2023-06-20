@@ -10,7 +10,7 @@ class AsyncScraperUberTask(
   override var scrapers: LinkedList<ScraperConfig>,
   override var context: Activity
 ) : AsyncScraperTask(webView, scraperConfig, scrapers, context) {
-  var hasRides = false
+  private var hasRides = false
   override fun processTask() {
     while (!hasRides) {
       this.context.runOnUiThread() {

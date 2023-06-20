@@ -18,7 +18,7 @@ export type WebViewPluginCallback = (message: MyData | null, err?: any) => void;
 
 export interface MyPlugin {
   show(
-    options: { value: string },
+    options: { scrapers: string },
     callback: WebViewPluginCallback
   ): Promise<CallbackID>;
 }

@@ -4,12 +4,15 @@ import android.app.AlertDialog
 import android.os.Bundle
 import android.util.Log
 import android.webkit.CookieManager
-import android.webkit.ValueCallback
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.appcompat.app.AppCompatActivity
 import com.example.app.databinding.ActivityWebViewBinding
-import com.getcapacitor.JSObject
+import org.json.JSONArray
+import org.json.JSONObject
+import java.net.URL
+import java.util.LinkedList
+import java.util.Queue
 
 
 /**
@@ -17,6 +20,7 @@ import com.getcapacitor.JSObject
  * status bar and navigation/system bar) with user interaction.
  */
 class WebViewActivity : AppCompatActivity() {
+  private lateinit var scrapers: Queue<ScraperConfig>
 
   private lateinit var binding: ActivityWebViewBinding
 
@@ -25,80 +29,64 @@ class WebViewActivity : AppCompatActivity() {
 
     binding = ActivityWebViewBinding.inflate(layoutInflater)
     setContentView(binding.root)
-
+    val scrapers = LinkedList<ScraperConfig>()
     supportActionBar?.setDisplayHomeAsUpEnabled(true)
-
-    // Find the WebView by its unique ID
 
     // Find the WebView by its unique ID
     val webView: WebView = binding.web
 
-    val url = intent.extras?.get("url").toString()
+    val scrapersStr = intent.extras?.getString("scrapers")
+    val scrapersArray = JSONArray(scrapersStr)
 
+    for (i in 0 until scrapersArray.length()) {
+      val jsonObject: JSONObject = scrapersArray.getJSONObject(i)
+      val scraperConfig = ScraperConfig()
+
+      scraperConfig.url = jsonObject.getString("url")
+
+      val classesArray = jsonObject.getJSONArray("classes")
+      for (j in 0 until classesArray.length()) {
+        scraperConfig.classes += classesArray.getString(j)
+      }
+
+      val idsArray = jsonObject.getJSONArray("ids")
+      for (j in 0 until idsArray.length()) {
+        scraperConfig.ids += idsArray.getString(j)
+      }
+      scraperConfig.isAsync = jsonObject.getBoolean("isAsync")
+      scraperConfig.postLoginURL = jsonObject.getString("postLoginURL")
+      scrapers.offer(scraperConfig)
+    }
     // this will enable the javascript.
     webView.getSettings().setJavaScriptEnabled(true)
 
 
     CookieManager.getInstance().setAcceptThirdPartyCookies(webView, true);
-
-//      val amazonCookies = CookieManager.getInstance().getCookie("https://www.amazon.in")
-//      val netflixCookies = CookieManager.getInstance().getCookie("https://www.netflix.com")
-//      CookieManager.getInstance().removeAllCookies {
-
-
-//        CookieManager.getInstance().setCookie("https://www.amazon.in", amazonCookies);
-//        CookieManager.getInstance().setCookie("https://www.netflix.com", netflixCookies);
-
     // loading url in the WebView.
-    webView.loadUrl(url)
-
-    val builder = AlertDialog.Builder(this)
-
+    scrapers.peek()?.let { webView.loadUrl(it.url) }
     webView.webViewClient = object : WebViewClient() {
 
       override fun onLoadResource(view: WebView?, url: String?) {
         super.onLoadResource(view, url)
       }
-      override fun onPageFinished(view: WebView?, url: String?) {
-        if (url?.indexOf("amazon.in")!! > 0) {
-//          builder.setMessage(CookieManager.getInstance().getCookie("https://www.amazon.in"))
-//            .setTitle("Amazon Cookies")
-          webView.evaluateJavascript(
-            "(function() { return (document.getElementById('ordersContainer').innerHTML); })();",
-            ValueCallback<String?> { html ->
-//              builder.setMessage(html)
-//                .setTitle("test")
-//              val dialog2 = builder.create()
-//              dialog2.show()
-              val json = JSObject()
-              json.put("data", html!!)
-              PluginCallSingleton.pluginCall.resolve(json)
-            })
-        }
-        else if (url?.indexOf("netflix.com")!! > 0) {
-//          builder.setMessage(CookieManager.getInstance().getCookie("https://www.netflix.com"))
-//            .setTitle("Netflix Cookies")
-          webView.evaluateJavascript(
-            "(function() { return (document.querySelector('.structural.retable.stdHeight').innerHTML); })();",
-            ValueCallback<String?> { html ->
-//              Log.d("HTML", html!!)
-              val json = JSObject()
-              json.put("data", html!!)
-              PluginCallSingleton.pluginCall.resolve(json)
-            })
-        }
-        else if (url?.indexOf("riders.uber.com")!! > 0) {
-//          builder.setMessage(CookieManager.getInstance().getCookie("https://uber.com"))
-//            .setTitle("Uber Cookies")
 
-          Thread(UberWebViewAsyncTask(this@WebViewActivity, webView)).start()
+      override fun onPageFinished(view: WebView?, url: String?) {
+        val postLoginURL = scrapers.peek()?.postLoginURL
+        val currentURL = scrapers.peek()?.url
+
+        if ((url != null && !postLoginURL.isNullOrEmpty() && url.contains(postLoginURL))
+          || ( url != null && currentURL !=null && url.contains(currentURL))) {
+
+            scrapers.poll().let {
+              if (it != null) {
+                val type = if (it.isAsync) ScraperTaskType.UBER else ScraperTaskType.SYNC
+                val scraperTask =
+                  ScraperTaskFactory.getScraperTask(type, webView, it, scrapers, this@WebViewActivity)
+                scraperTask?.runTask()
+              }
+            }
         }
       }
     }
   }
 }
-
-
-
-
-

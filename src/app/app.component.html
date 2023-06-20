@@ -8,7 +8,6 @@
 
 <div style="padding-bottom: 20px" *ngIf="products.length !== 0">
   <h1>Amazon Data</h1>
-
   <div *ngFor="let product of products" class="product">
     <img class="product-img" [src]="product.src" />
     <div>

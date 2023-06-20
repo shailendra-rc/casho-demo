@@ -1,6 +1,26 @@
 import { Component, NgZone } from '@angular/core';
 import { Dialog } from '@capacitor/dialog';
 import WebView from 'src/plugins/nativePlugins';
+class ScraperConfig {
+  constructor(
+    url?: string,
+    postLoginURL?: string,
+    classes?: string[],
+    ids?: string[],
+    isAsync?: boolean
+  ) {
+    this.url = url;
+    this.classes = classes;
+    this.ids = ids;
+    this.isAsync = isAsync;
+    this.postLoginURL = postLoginURL;
+  }
+  url?: string;
+  classes?: string[];
+  ids?: string[];
+  isAsync?: boolean;
+  postLoginURL?: string;
+}
 class Product {
   constructor(obj?: any) {
     Object.assign(this, obj);
@@ -42,10 +62,39 @@ export class AppComponent {
   constructor(private _ngZone: NgZone) {}
 
   openAmazon() {
+    const scraperConfigs = [
+      new ScraperConfig(
+        'https://www.amazon.in/gp/your-account/order-history?unifiedOrders=0&digitalOrders=0&janeOrders=0&orderFilter=year-2022&ref_=ppx_yo2ov_mob_b_filter_y2022_all',
+        'https://www.amazon.in/gp/css/order-history',
+        [],
+        ['ordersContainer'],
+        false
+      ),
+      new ScraperConfig(
+        'https://www.amazon.in/gp/your-account/order-history?unifiedOrders=0&digitalOrders=0&janeOrders=0&orderFilter=year-2021&ref_=ppx_yo2ov_mob_b_filter_y2021_all',
+        'https://www.amazon.in/gp/css/order-history',
+        [],
+        ['ordersContainer'],
+        false
+      ),
+      new ScraperConfig(
+        'https://www.amazon.in/gp/your-account/order-history?unifiedOrders=0&digitalOrders=0&janeOrders=0&orderFilter=year-2020&ref_=ppx_yo2ov_mob_b_filter_y2020_all',
+        'https://www.amazon.in/gp/css/order-history',
+        [],
+        ['ordersContainer'],
+        false
+      ),
+      new ScraperConfig(
+        'https://www.amazon.in/gp/your-account/order-history?unifiedOrders=0&digitalOrders=0&janeOrders=0&orderFilter=year-2019&ref_=ppx_yo2ov_mob_b_filter_y2019_all',
+        'https://www.amazon.in/gp/css/order-history',
+        [],
+        ['ordersContainer'],
+        false
+      ),
+    ];
     WebView.show(
       {
-        value:
-          'https://www.amazon.in/gp/your-account/order-history?unifiedOrders=0&digitalOrders=0&janeOrders=0&orderFilter=year-2022&ref_=ppx_yo2ov_mob_b_filter_y2022_all',
+        scrapers: JSON.stringify(scraperConfigs),
       },
       (data) => {
         if (data?.data) {
@@ -53,7 +102,6 @@ export class AppComponent {
             .replace(/\\u003C/g, '<')
             .replace(/\\"/g, "'")
             .replace(/\\n/g, '');
-
           const products: Product[] = [];
           var parser = new DOMParser();
           var test = parser.parseFromString(htmlstring, 'text/html');
@@ -82,10 +130,25 @@ export class AppComponent {
   }
 
   openNetflix() {
+    const scraperConfigs = [
+      new ScraperConfig(
+        'https://www.netflix.com/settings/viewed/NKDVDV2YN5ANRA6APRM2JRSK4A',
+        'https://www.netflix.com/settings/viewed/NKDVDV2YN5ANRA6APRM2JRSK4A',
+        ['structural', 'retable', 'stdHeight'],
+        [],
+        false
+      ),
+      new ScraperConfig(
+        'https://www.netflix.com/settings/viewed/J6THFU6HJVBFLDKUKWK3SFDORU',
+        'https://www.netflix.com/settings/viewed/J6THFU6HJVBFLDKUKWK3SFDORU',
+        ['structural', 'retable', 'stdHeight'],
+        [],
+        false
+      ),
+    ];
     WebView.show(
       {
-        value:
-          'https://www.netflix.com/settings/viewed/NKDVDV2YN5ANRA6APRM2JRSK4A',
+        scrapers: JSON.stringify(scraperConfigs),
       },
       (data) => {
         if (data?.data) {
@@ -114,9 +177,25 @@ export class AppComponent {
   }
 
   openUber() {
+    const scraperConfigs = [
+      new ScraperConfig(
+        'https://riders.uber.com/trips',
+        'https://riders.uber.com/trips',
+        ['_css-gemfqT'],
+        [],
+        true
+      ),
+      new ScraperConfig(
+        'https://riders.uber.com/trips?page=4',
+        'https://riders.uber.com/trips?page=4',
+        ['_css-gemfqT'],
+        [],
+        true
+      ),
+    ];
     WebView.show(
       {
-        value: 'https://riders.uber.com/trips',
+        scrapers: JSON.stringify(scraperConfigs),
       },
       (data) => {
         if (data?.data) {

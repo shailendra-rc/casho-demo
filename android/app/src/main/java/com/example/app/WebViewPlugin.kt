@@ -14,9 +14,9 @@ class WebView : Plugin() {
 
   @PluginMethod(returnType = PluginMethod.RETURN_CALLBACK)
   open fun show(call: PluginCall) {
-    val url = call.getString("value")
+    val scrapersStr = call.getString("scrapers")
     val myIntent = Intent(bridge.webView.context, WebViewActivity::class.java)
-    myIntent.putExtra("url", url)
+    myIntent.putExtra("scrapers", scrapersStr)
     bridge.webView.context.startActivity(myIntent)
 
     call.setKeepAlive(true)
