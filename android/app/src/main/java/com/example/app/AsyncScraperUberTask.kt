@@ -17,6 +17,9 @@ class AsyncScraperUberTask(
         this.webView.evaluateJavascript(getJavascript()) { html ->
           if (html.toString().isNotEmpty() && html.contains("Past Trips")) {
             scrapData(html)
+//            webView.evaluateJavascript("(function() { return document.querySelector('._css-fzayjn').click(); })();") {
+//
+//            }
             this.hasRides = true
           }
         }

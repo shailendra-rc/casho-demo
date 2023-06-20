@@ -56,12 +56,16 @@ class Ride {
 })
 export class AppComponent {
   title = 'casho';
+  amazonData: string = '';
+  netflixData: string = '';
+  uberData: string = '';
   products: Product[] = [];
   shows: Show[] = [];
   rides: Ride[] = [];
   constructor(private _ngZone: NgZone) {}
 
   openAmazon() {
+    this.amazonData = '';
     const scraperConfigs = [
       new ScraperConfig(
         'https://www.amazon.in/gp/your-account/order-history?unifiedOrders=0&digitalOrders=0&janeOrders=0&orderFilter=year-2022&ref_=ppx_yo2ov_mob_b_filter_y2022_all',
@@ -102,9 +106,10 @@ export class AppComponent {
             .replace(/\\u003C/g, '<')
             .replace(/\\"/g, "'")
             .replace(/\\n/g, '');
+          this.amazonData += htmlstring;
           const products: Product[] = [];
           var parser = new DOMParser();
-          var test = parser.parseFromString(htmlstring, 'text/html');
+          var test = parser.parseFromString(this.amazonData, 'text/html');
           test
             .querySelectorAll('.a-section.a-padding-small.js-item')
             .forEach((element) => {
@@ -130,6 +135,7 @@ export class AppComponent {
   }
 
   openNetflix() {
+    this.netflixData = '';
     const scraperConfigs = [
       new ScraperConfig(
         'https://www.netflix.com/settings/viewed/NKDVDV2YN5ANRA6APRM2JRSK4A',
@@ -155,10 +161,11 @@ export class AppComponent {
           const htmlstring = data.data
             .replace(/\\u003C/g, '<')
             .replace(/\\"/g, "'");
+          this.netflixData += htmlstring;
           const shows: Show[] = [];
           var netflixParser = new DOMParser();
           var testNetflix = netflixParser.parseFromString(
-            htmlstring,
+            this.netflixData,
             'text/html'
           );
           testNetflix.querySelectorAll('.retableRow').forEach((x) => {
@@ -177,6 +184,7 @@ export class AppComponent {
   }
 
   openUber() {
+    this.uberData = '';
     const scraperConfigs = [
       new ScraperConfig(
         'https://riders.uber.com/trips',
@@ -202,8 +210,9 @@ export class AppComponent {
           const htmlstring = data.data
             .replace(/\\u003C/g, '<')
             .replace(/\\"/g, "'");
+          this.uberData += htmlstring;
           var uberParser = new DOMParser();
-          var testUber = uberParser.parseFromString(htmlstring, 'text/html');
+          var testUber = uberParser.parseFromString(this.uberData, 'text/html');
           const rides: Ride[] = [];
           testUber.querySelectorAll('._css-gtxWCh').forEach((x) => {
             let ride = new Ride();
