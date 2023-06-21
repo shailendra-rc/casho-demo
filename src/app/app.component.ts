@@ -7,19 +7,22 @@ class ScraperConfig {
     postLoginURL?: string,
     classes?: string[],
     ids?: string[],
-    isAsync?: boolean
+    isAsync?: boolean,
+    click?: string
   ) {
     this.url = url;
     this.classes = classes;
     this.ids = ids;
     this.isAsync = isAsync;
     this.postLoginURL = postLoginURL;
+    this.click = click;
   }
   url?: string;
   classes?: string[];
   ids?: string[];
   isAsync?: boolean;
   postLoginURL?: string;
+  click?: string;
 }
 class Product {
   constructor(obj?: any) {
@@ -56,44 +59,45 @@ class Ride {
 })
 export class AppComponent {
   title = 'casho';
-  amazonData: string = '';
-  netflixData: string = '';
-  uberData: string = '';
   products: Product[] = [];
   shows: Show[] = [];
   rides: Ride[] = [];
   constructor(private _ngZone: NgZone) {}
 
   openAmazon() {
-    this.amazonData = '';
+    var amazonData = '';
     const scraperConfigs = [
       new ScraperConfig(
         'https://www.amazon.in/gp/your-account/order-history?unifiedOrders=0&digitalOrders=0&janeOrders=0&orderFilter=year-2022&ref_=ppx_yo2ov_mob_b_filter_y2022_all',
         'https://www.amazon.in/gp/css/order-history',
         [],
         ['ordersContainer'],
-        false
+        false,
+        ''
       ),
       new ScraperConfig(
         'https://www.amazon.in/gp/your-account/order-history?unifiedOrders=0&digitalOrders=0&janeOrders=0&orderFilter=year-2021&ref_=ppx_yo2ov_mob_b_filter_y2021_all',
         'https://www.amazon.in/gp/css/order-history',
         [],
         ['ordersContainer'],
-        false
+        false,
+        ''
       ),
       new ScraperConfig(
         'https://www.amazon.in/gp/your-account/order-history?unifiedOrders=0&digitalOrders=0&janeOrders=0&orderFilter=year-2020&ref_=ppx_yo2ov_mob_b_filter_y2020_all',
         'https://www.amazon.in/gp/css/order-history',
         [],
         ['ordersContainer'],
-        false
+        false,
+        ''
       ),
       new ScraperConfig(
         'https://www.amazon.in/gp/your-account/order-history?unifiedOrders=0&digitalOrders=0&janeOrders=0&orderFilter=year-2019&ref_=ppx_yo2ov_mob_b_filter_y2019_all',
         'https://www.amazon.in/gp/css/order-history',
         [],
         ['ordersContainer'],
-        false
+        false,
+        ''
       ),
     ];
     WebView.show(
@@ -106,10 +110,10 @@ export class AppComponent {
             .replace(/\\u003C/g, '<')
             .replace(/\\"/g, "'")
             .replace(/\\n/g, '');
-          this.amazonData += htmlstring;
+          amazonData += htmlstring;
           const products: Product[] = [];
           var parser = new DOMParser();
-          var test = parser.parseFromString(this.amazonData, 'text/html');
+          var test = parser.parseFromString(amazonData, 'text/html');
           test
             .querySelectorAll('.a-section.a-padding-small.js-item')
             .forEach((element) => {
@@ -135,21 +139,23 @@ export class AppComponent {
   }
 
   openNetflix() {
-    this.netflixData = '';
+    var netflixData = '';
     const scraperConfigs = [
       new ScraperConfig(
         'https://www.netflix.com/settings/viewed/NKDVDV2YN5ANRA6APRM2JRSK4A',
         'https://www.netflix.com/settings/viewed/NKDVDV2YN5ANRA6APRM2JRSK4A',
         ['structural', 'retable', 'stdHeight'],
         [],
-        false
+        false,
+        ''
       ),
       new ScraperConfig(
         'https://www.netflix.com/settings/viewed/J6THFU6HJVBFLDKUKWK3SFDORU',
         'https://www.netflix.com/settings/viewed/J6THFU6HJVBFLDKUKWK3SFDORU',
         ['structural', 'retable', 'stdHeight'],
         [],
-        false
+        false,
+        ''
       ),
     ];
     WebView.show(
@@ -161,11 +167,11 @@ export class AppComponent {
           const htmlstring = data.data
             .replace(/\\u003C/g, '<')
             .replace(/\\"/g, "'");
-          this.netflixData += htmlstring;
+          netflixData += htmlstring;
           const shows: Show[] = [];
           var netflixParser = new DOMParser();
           var testNetflix = netflixParser.parseFromString(
-            this.netflixData,
+            netflixData,
             'text/html'
           );
           testNetflix.querySelectorAll('.retableRow').forEach((x) => {
@@ -184,22 +190,23 @@ export class AppComponent {
   }
 
   openUber() {
-    this.uberData = '';
+    var uberData = '';
     const scraperConfigs = [
       new ScraperConfig(
         'https://riders.uber.com/trips',
         'https://riders.uber.com/trips',
         ['_css-gemfqT'],
         [],
-        true
+        true,
+        '._css-iaHSAI button'
       ),
-      new ScraperConfig(
-        'https://riders.uber.com/trips?page=4',
-        'https://riders.uber.com/trips?page=4',
-        ['_css-gemfqT'],
-        [],
-        true
-      ),
+      // new ScraperConfig(
+      //   'https://riders.uber.com/trips?page=4',
+      //   'https://riders.uber.com/trips?page=4',
+      //   ['_css-gemfqT'],
+      //   [],
+      //   true
+      // ),
     ];
     WebView.show(
       {
@@ -210,9 +217,9 @@ export class AppComponent {
           const htmlstring = data.data
             .replace(/\\u003C/g, '<')
             .replace(/\\"/g, "'");
-          this.uberData += htmlstring;
+          uberData += htmlstring;
           var uberParser = new DOMParser();
-          var testUber = uberParser.parseFromString(this.uberData, 'text/html');
+          var testUber = uberParser.parseFromString(uberData, 'text/html');
           const rides: Ride[] = [];
           testUber.querySelectorAll('._css-gtxWCh').forEach((x) => {
             let ride = new Ride();

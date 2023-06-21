@@ -55,6 +55,7 @@ class WebViewActivity : AppCompatActivity() {
       }
       scraperConfig.isAsync = jsonObject.getBoolean("isAsync")
       scraperConfig.postLoginURL = jsonObject.getString("postLoginURL")
+      scraperConfig.click = jsonObject.getString("click")
       scrapers.offer(scraperConfig)
     }
     // this will enable the javascript.

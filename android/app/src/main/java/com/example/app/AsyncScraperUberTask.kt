@@ -17,9 +17,25 @@ class AsyncScraperUberTask(
         this.webView.evaluateJavascript(getJavascript()) { html ->
           if (html.toString().isNotEmpty() && html.contains("Past Trips")) {
             scrapData(html)
-//            webView.evaluateJavascript("(function() { return document.querySelector('._css-fzayjn').click(); })();") {
-//
-//            }
+
+            val updatedScraperConfig = ScraperConfig()
+            updatedScraperConfig.buttonClicks.add(scraperConfig.click)
+            updatedScraperConfig.isAsync = scraperConfig.isAsync
+            updatedScraperConfig.classes = scraperConfig.classes
+            updatedScraperConfig.ids = scraperConfig.ids
+            updatedScraperConfig.url = scraperConfig.url
+            updatedScraperConfig.click = scraperConfig.click
+            updatedScraperConfig.postLoginURL = scraperConfig.postLoginURL
+            val scraperTask =
+              ScraperTaskFactory.getScraperTask(
+                ScraperTaskType.UBER,
+                webView,
+                updatedScraperConfig,
+                scrapers,
+                context
+              )
+            scraperTask?.runTask()
+
             this.hasRides = true
           }
         }
